@@ -51,4 +51,5 @@ temp/
 *.jfm
 database/database.dbmdl
 /.vscode/settings.json
-tests/Benchmarks/BenchmarkDotNet.Artifacts/*
+/tests/Benchmarks/BenchmarkDotNet.Artifacts/*
+/BenchmarkDotNet.Artifacts/*

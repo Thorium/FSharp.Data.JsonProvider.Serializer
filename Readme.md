@@ -59,8 +59,12 @@ let toJson mymodel = Serializer.Serialize (mymodel.JsonValue)
 ```
 
 Besides of this, you continue using your existing JsonProvider implementation as is.
+Currently it uses System.Text.Json style of encoding the quote characters, etc. but if you want to customize
+your serialization more, you can set JsonReaderOptions and JsonWriterOptions as parameters.
 
 ## Initial Benchmarks
+
+FSharp.Data 6.3, System.Text.Json 8.0
 
 Test-case:
 - Read JSON to JsonProvider. (Serialization)
@@ -74,19 +78,24 @@ BenchmarkDotNet v0.13.10, Windows 11 (10.0.22621.2715/22H2/2022Update/SunValley2
 
 ### .NET 8.0.0 (8.0.23.53103), X64 RyuJIT AVX2 DEBUG
 
-| Method                                  | Mean           | Error         | StdDev        | Median         | Gen0      | Gen1      | Gen2      | Allocated   |
-|---------------------------------------- |---------------:|--------------:|--------------:|---------------:|----------:|----------:|----------:|------------:|
-| Serialization_SmallJson_JsonProvider    |       7.050 us |     0.2193 us |     0.6465 us |       6.616 us |    0.8545 |         - |         - |     5.32 KB |
-| Serialization_SmallJson_SystemTextJson  |       5.000 us |     0.0416 us |     0.0369 us |       4.998 us |    0.5798 |         - |         - |     3.59 KB |
-| Serialization_StripeJson_JsonProvider   | 110,650.331 us | 1,939.4994 us | 1,619.5699 us | 111,154.500 us | 8200.0000 | 3800.0000 | 1400.0000 | 61615.76 KB |
-| Serialization_StripeJson_SystemTextJson |  79,382.557 us | 1,570.6070 us | 1,469.1468 us |  79,597.929 us | 6857.1429 | 2857.1429 | 1000.0000 |  61057.1 KB |
+| Method                                         | Mean           | Error         | StdDev        | Gen0      | Gen1      | Gen2      | Allocated   |
+|----------------------------------------------- |---------------:|--------------:|--------------:|----------:|----------:|----------:|------------:|
+| Serialization_SmallJson_JsonProvider           |       6.690 μs |     0.0676 μs |     0.0632 μs |    0.8621 |         - |         - |     5.32 KB |
+| Serialization_SmallJson_SystemTextJson         |       5.110 μs |     0.0538 μs |     0.0477 μs |    0.5798 |         - |         - |     3.59 KB |
+| Serialization_List1000SmallJson_JsonProvider   |   7,133.210 μs |    55.7108 μs |    49.3862 μs |  695.3125 |  343.7500 |   54.6875 |   4465.7 KB |
+| Serialization_List1000SmallJson_SystemTextJson |   4,857.725 μs |    54.6552 μs |    51.1245 μs |  992.1875 |  195.3125 |  195.3125 |  6727.73 KB |
+| Serialization_StripeJson_JsonProvider          | 106,183.427 μs | 1,839.6922 μs | 2,118.5922 μs | 8200.0000 | 3800.0000 | 1400.0000 | 61611.32 KB |
+| Serialization_StripeJson_SystemTextJson        |  77,737.344 μs | 1,336.4109 μs | 1,312.5342 μs | 6857.1429 | 2857.1429 | 1000.0000 | 61055.16 KB |
 
 ### .NET Framework 4.8 : .NET Framework 4.8.1 (4.8.9181.0), X64 RyuJIT VectorSize=256
 
-| Method                                  | Mean           | Error         | StdDev        | Gen0      | Gen1      | Gen2      | Allocated   |
-|---------------------------------------- |---------------:|--------------:|--------------:|----------:|----------:|----------:|------------:|
-| Serialization_SmallJson_JsonProvider    |       7.132 us |     0.0773 us |     0.0685 us |    0.8621 |         - |         - |     5.32 KB |
-| Serialization_SmallJson_SystemTextJson  |       4.938 us |     0.0664 us |     0.0621 us |    0.5798 |         - |         - |     3.59 KB |
-| Serialization_StripeJson_JsonProvider   | 107,985.207 us | 1,474.9305 us | 1,151.5288 us | 8200.0000 | 3800.0000 | 1400.0000 | 61615.82 KB |
-| Serialization_StripeJson_SystemTextJson |  81,017.954 us | 1,565.8860 us | 2,295.2554 us | 6857.1429 | 2857.1429 | 1000.0000 | 61057.03 KB |
+| Method                                         | Mean           | Error         | StdDev        | Gen0      | Gen1      | Gen2      | Allocated   |
+|----------------------------------------------- |---------------:|--------------:|--------------:|----------:|----------:|----------:|------------:|
+| Serialization_SmallJson_JsonProvider           |       6.734 μs |     0.1130 μs |     0.1002 μs |    0.8621 |         - |         - |     5.32 KB |
+| Serialization_SmallJson_SystemTextJson         |       5.022 μs |     0.0470 μs |     0.0440 μs |    0.5798 |         - |         - |     3.59 KB |
+| Serialization_List1000SmallJson_JsonProvider   |   7,073.432 μs |    44.3017 μs |    41.4398 μs |  695.3125 |  343.7500 |   54.6875 |   4465.7 KB |
+| Serialization_List1000SmallJson_SystemTextJson |   4,799.585 μs |    20.7208 μs |    18.3684 μs |  992.1875 |  195.3125 |  195.3125 |  6727.73 KB |
+| Serialization_StripeJson_JsonProvider          | 107,795.785 μs | 2,093.3960 μs | 2,865.4641 μs | 8200.0000 | 3800.0000 | 1400.0000 |  61614.1 KB |
+| Serialization_StripeJson_SystemTextJson        |  79,231.282 μs | 1,565.7823 μs | 1,863.9524 μs | 6857.1429 | 2857.1429 | 1000.0000 | 61048.42 KB |
 
+To run the test: dotnet run --project tests\Benchmarks\BenchmarkTests.fsproj --configuration=Release --framework=net8.0
