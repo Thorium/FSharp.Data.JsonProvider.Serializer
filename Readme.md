@@ -2,6 +2,7 @@
 # FSharp.Data.JsonProvider.Serializer
 
 NuGet package: https://www.nuget.org/packages/FSharp.Data.JsonProvider.Serializer/
+This is not independent package, you still use your current JsonProvider.
 
 This will provide utilities to use the fast `System.Text.Json` library to serialize the `FSharp.Data.JsonProvider` items.
 
