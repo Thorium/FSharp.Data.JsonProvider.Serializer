@@ -77,26 +77,75 @@ Tested with small JSON file, and with Stripe OpenAPI spec file (+5MB of JSON).
 BenchmarkDotNet v0.13.10, Windows 11 (10.0.22621.2715/22H2/2022Update/SunValley2)
 13th Gen Intel Core i9-13900H, 1 CPU, 20 logical and 14 physical cores
 
-### .NET 8.0.0 (8.0.23.53103), X64 RyuJIT AVX2 DEBUG
 
-| Method                                         | Mean           | Error         | StdDev        | Gen0      | Gen1      | Gen2      | Allocated   |
-|----------------------------------------------- |---------------:|--------------:|--------------:|----------:|----------:|----------:|------------:|
-| Serialization_SmallJson_JsonProvider           |       6.690 μs |     0.0676 μs |     0.0632 μs |    0.8621 |         - |         - |     5.32 KB |
-| Serialization_SmallJson_SystemTextJson         |       5.110 μs |     0.0538 μs |     0.0477 μs |    0.5798 |         - |         - |     3.59 KB |
-| Serialization_List1000SmallJson_JsonProvider   |   7,133.210 μs |    55.7108 μs |    49.3862 μs |  695.3125 |  343.7500 |   54.6875 |   4465.7 KB |
-| Serialization_List1000SmallJson_SystemTextJson |   4,857.725 μs |    54.6552 μs |    51.1245 μs |  992.1875 |  195.3125 |  195.3125 |  6727.73 KB |
-| Serialization_StripeJson_JsonProvider          | 106,183.427 μs | 1,839.6922 μs | 2,118.5922 μs | 8200.0000 | 3800.0000 | 1400.0000 | 61611.32 KB |
-| Serialization_StripeJson_SystemTextJson        |  77,737.344 μs | 1,336.4109 μs | 1,312.5342 μs | 6857.1429 | 2857.1429 | 1000.0000 | 61055.16 KB |
 
-### .NET Framework 4.8 : .NET Framework 4.8.1 (4.8.9181.0), X64 RyuJIT VectorSize=256
+#### .NET 8.0 : .NET 8.0.0 (8.0.23.53103), X64 RyuJIT AVX2
 
-| Method                                         | Mean           | Error         | StdDev        | Gen0      | Gen1      | Gen2      | Allocated   |
-|----------------------------------------------- |---------------:|--------------:|--------------:|----------:|----------:|----------:|------------:|
-| Serialization_SmallJson_JsonProvider           |       6.734 μs |     0.1130 μs |     0.1002 μs |    0.8621 |         - |         - |     5.32 KB |
-| Serialization_SmallJson_SystemTextJson         |       5.022 μs |     0.0470 μs |     0.0440 μs |    0.5798 |         - |         - |     3.59 KB |
-| Serialization_List1000SmallJson_JsonProvider   |   7,073.432 μs |    44.3017 μs |    41.4398 μs |  695.3125 |  343.7500 |   54.6875 |   4465.7 KB |
-| Serialization_List1000SmallJson_SystemTextJson |   4,799.585 μs |    20.7208 μs |    18.3684 μs |  992.1875 |  195.3125 |  195.3125 |  6727.73 KB |
-| Serialization_StripeJson_JsonProvider          | 107,795.785 μs | 2,093.3960 μs | 2,865.4641 μs | 8200.0000 | 3800.0000 | 1400.0000 |  61614.1 KB |
-| Serialization_StripeJson_SystemTextJson        |  79,231.282 μs | 1,565.7823 μs | 1,863.9524 μs | 6857.1429 | 2857.1429 | 1000.0000 | 61048.42 KB |
+| Method                                 | Mean          | Error         | StdDev        | Gen0      | Gen1      | Gen2      | Allocated   |
+|--------------------------------------- |--------------:|--------------:|--------------:|----------:|----------:|----------:|------------:|
+| SmallJson_JsonProvider                 |      2.789 μs |     0.0314 μs |     0.0293 μs |    0.4120 |         - |         - |     5.06 KB |
+| SmallJson_SystemTextJson               |      1.623 μs |     0.0308 μs |     0.0288 μs |    0.2651 |         - |         - |     3.27 KB |
+| ListOf1000SmallJsons_JsonProvider      |  2,849.210 μs |    25.9458 μs |    20.2568 μs |  351.5625 |  175.7813 |   58.5938 |   4224.8 KB |
+| ListOf1000SmallJsons_SystemTextJson    |  1,424.314 μs |     9.3599 μs |     8.7553 μs |  199.2188 |  199.2188 |  199.2188 |  2469.76 KB |
+| StripeJson_JsonProvider                | 83,610.123 μs | 1,667.5590 μs | 3,406.3812 μs | 5285.7143 | 4571.4286 | 1714.2857 | 60521.87 KB |
+| StripeJson_SystemTextJsonBytes         | 42,775.639 μs |   822.2020 μs | 1,009.7378 μs | 2333.3333 | 2166.6667 |  750.0000 | 44305.47 KB |
+
+
+
+#### .NET Framework 4.8 : .NET Framework 4.8.1 (4.8.9181.0), X64 RyuJIT VectorSize=256
+
+| Method                                 | Mean           | Error         | StdDev        | Gen0      | Gen1      | Gen2      | Allocated   |
+|--------------------------------------- |---------------:|--------------:|--------------:|----------:|----------:|----------:|------------:|
+| SmallJson_JsonProvider                 |       6.613 μs |     0.0554 μs |     0.0518 μs |    0.8621 |         - |         - |     5.32 KB |
+| SmallJson_SystemTextJson               |       4.832 μs |     0.0542 μs |     0.0480 μs |    0.5493 |         - |         - |      3.4 KB |
+| ListOf1000SmallJsons_JsonProvider      |   7,052.777 μs |    53.6100 μs |    47.5238 μs |  695.3125 |  343.7500 |   54.6875 |   4465.7 KB |
+| ListOf1000SmallJsons_SystemTextJson    |   4,453.736 μs |    43.9446 μs |    41.1058 μs |  390.6250 |  195.3125 |  195.3125 |  2587.36 KB |
+| StripeJson_JsonProvider                | 107,016.899 μs | 2,094.9813 μs | 3,500.2432 μs | 8200.0000 | 3800.0000 | 1400.0000 | 61612.22 KB |
+| StripeJson_SystemTextJsonBytes         |  77,002.389 μs | 1,531.7106 μs | 2,559.1443 μs | 4285.7143 | 2285.7143 | 1000.0000 | 45245.97 KB |
+
 
 To run the test: dotnet run --project tests\Benchmarks\BenchmarkTests.fsproj --configuration=Release --framework=net8.0
+
+
+## API
+
+FSharp.Data uses internally class called `FSharp.Data.JsonValue` to model the JSON domain.
+
+#### From JSON to JsonProvider
+
+- `Deserialize`: string to FSharp.Data.JsonValue
+- `DeserializeWith`: string and System.Text.Json.JsonReaderOptions to FSharp.Data.JsonValue
+- `DeserializeBytes`: byte array to FSharp.Data.JsonValue
+- `DeserializeBytesWith`: byte array and System.Text.Json.JsonReaderOptions to FSharp.Data.JsonValue
+
+#### From JsonProvider to JSON
+
+- `Serialize`: FSharp.Data.JsonValue to string
+- `SerializeWith`: FSharp.Data.JsonValue and System.Text.Json.JsonWriterOptions to string
+- `SerializeBytes`: FSharp.Data.JsonValue to byte array
+- `SerializeBytesWith`: FSharp.Data.JsonValue and System.Text.Json.JsonWriterOptions to byte array
+
+#### From JsonProvider to JSON, Streaming
+
+With streaming support you can send JSON-data to output stream record-per-record.
+
+- `SerializeStream`: destination stream, FSharp.Data.JsonValue
+- `SerializeStreamWith`: destination stream, FSharp.Data.JsonValue and System.Text.Json.JsonWriterOptions
+
+Streaming may keep around the same performance characteristics, but reduce a memory allocation a bit and provide partially consumable results faster if JSON is large and the client supports streaming.
+
+**.NET 8.0 : .NET 8.0.0 (8.0.23.53103), X64 RyuJIT AVX2**
+
+| Method                                    | Mean          | Error         | StdDev        | Gen0      | Gen1      | Gen2      | Allocated   |
+|------------------------------------------ |--------------:|--------------:|--------------:|----------:|----------:|----------:|------------:|
+| ListOf1000SmallJsons_SystemTextJsonStream |  1,525.970 μs |    14.0992 μs |    13.1884 μs |  158.2031 |  117.1875 |   78.1250 |  2100.46 KB |
+| StripeJson_SystemTextJsonStream           | 47,112.065 μs |   805.5929 μs |   753.5521 μs | 2333.3333 | 2250.0000 |  750.0000 | 31560.25 KB |
+
+**.NET Framework 4.8 : .NET Framework 4.8.1 (4.8.9181.0), X64 RyuJIT VectorSize=256**
+
+| Method                                    | Mean           | Error         | StdDev        | Gen0      | Gen1      | Gen2      | Allocated   |
+|------------------------------------------ |---------------:|--------------:|--------------:|----------:|----------:|----------:|------------:|
+| ListOf1000SmallJsons_SystemTextJsonStream |   4,650.089 μs |    34.2087 μs |    30.3251 μs |  312.5000 |  156.2500 |   78.1250 |  2217.05 KB |
+| StripeJson_SystemTextJsonStream           |  76,921.557 μs | 1,448.2545 μs | 1,778.5866 μs | 4000.0000 | 2000.0000 | 1000.0000 | 32501.88 KB |
+
+

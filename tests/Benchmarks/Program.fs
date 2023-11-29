@@ -78,13 +78,19 @@ printfn "Basic validation pass. Ready for benchmarking"
 open BenchmarkDotNet.Attributes
 open BenchmarkDotNet.Running
 open BenchmarkDotNet.Jobs
+open System.IO
 
 
 //[<Literal>] //StripeJson: Download from https://raw.githubusercontent.com/stripe/openapi/master/openapi/spec3.json
 //let stripeJson = @"C:\git\FSharp.Data.JsonProvider.Serializer\tests\Benchmarks\spec3.json"
 //type HugeJson = FSharp.Data.JsonProvider<stripeJson, SampleIsList=true>
 
+#if net48
 [<SimpleJob (RuntimeMoniker.Net48); MemoryDiagnoser(true)>]
+#endif
+#if net80
+[<SimpleJob (RuntimeMoniker.Net80); MemoryDiagnoser(true)>]
+#endif
 type Benchmark() =
 
     // Test 1000 small items JSON
@@ -93,7 +99,7 @@ type Benchmark() =
     // Test small JSON
 
     [<Benchmark()>]
-    member this.Serialization_SmallJson_JsonProvider() =
+    member this.SmallJson_JsonProvider() =
         let dom = SmallItem.Parse sampleJson
         if (dom.MyRoot.Name <> "Tuomas") then failwith "didn't work"
         let res = dom.JsonValue.ToString(JsonSaveOptions.DisableFormatting)
@@ -101,14 +107,14 @@ type Benchmark() =
 
         
     [<Benchmark>]
-    member this.Serialization_SmallJson_SystemTextJson() =
+    member this.SmallJson_SystemTextJson() =
         let dom = SmallItem.Load (Serializer.Deserialize sampleJson)
         if (dom.MyRoot.Name <> "Tuomas") then failwith "didn't work"
         let res = Serializer.Serialize (dom.JsonValue)
         res.Length
 
     [<Benchmark()>]
-    member this.Serialization_List1000SmallJson_JsonProvider() =
+    member this.ListOf1000SmallJsons_JsonProvider() =
         let dom = ListItems.Parse thousandItems
         if (dom.Items.[500].MyRoot.Name <> "Tuomas") then failwith "didn't work"
         let res = dom.JsonValue.ToString(JsonSaveOptions.DisableFormatting)
@@ -116,7 +122,7 @@ type Benchmark() =
 
         
     [<Benchmark>]
-    member this.Serialization_List1000SmallJson_SystemTextJson() =
+    member this.ListOf1000SmallJsons_SystemTextJson() =
         let dom = ListItems.Load (Serializer.Deserialize thousandItems)
         if (dom.Items.[500].MyRoot.Name <> "Tuomas") then failwith "didn't work"
         let res = Serializer.Serialize (dom.JsonValue)
@@ -126,30 +132,56 @@ type Benchmark() =
     // Test large JSON
 
     [<Benchmark()>]
-    member this.Serialization_StripeJson_JsonProvider() =
+    member this.StripeJson_JsonProvider() =
         //let load = System.IO.File.ReadAllBytes(stripeJson)
         let dom = HugeJson.Load(stripeJson)
         if (dom.Paths.V1ApplicationFees.Get.OperationId <> "GetApplicationFees") then failwith "didn't work"
         let res = dom.JsonValue.ToString(JsonSaveOptions.DisableFormatting)
         res.Length
-        
+
     [<Benchmark>]
-    member this.Serialization_StripeJson_SystemTextJson() =
+    member this.StripeJson_SystemTextJsonBytes() =
         let load = System.ReadOnlySpan(System.IO.File.ReadAllBytes stripeJson)
         let dom = HugeJson.Load (Serializer.DeserializeBytes load)
         if (dom.Paths.V1ApplicationFees.Get.OperationId <> "GetApplicationFees") then failwith "didn't work"
         let res = Serializer.Serialize (dom.JsonValue)
         res.Length
+
+*)
+
+
+    // Stream
+
+    [<Benchmark>]
+    member this.ListOf1000SmallJsons_SystemTextJsonStream() =
+        let dom = ListItems.Load (Serializer.Deserialize thousandItems)
+        if (dom.Items.[500].MyRoot.Name <> "Tuomas") then failwith "didn't work"
+        use ms = new MemoryStream()
+        Serializer.SerializeStream (ms, dom.JsonValue)
+        ms.Length
+
+(*
+    [<Benchmark>]
+    member this.StripeJson_SystemTextJsonStream() =
+        let load = System.ReadOnlySpan(System.IO.File.ReadAllBytes stripeJson)
+        let dom = HugeJson.Load (Serializer.DeserializeBytes load)
+        if (dom.Paths.V1ApplicationFees.Get.OperationId <> "GetApplicationFees") then failwith "didn't work"
+        use ms = new MemoryStream()
+        Serializer.SerializeStream (ms, dom.JsonValue)
+        ms.Length
 *)
 
 BenchmarkRunner.Run<Benchmark>() |> ignore
 
-(* // For debugging:
-(Benchmark()).Serialization_SmallJson_JsonProvider() |> ignore
-(Benchmark()).Serialization_SmallJson_SystemTextJson() |> ignore
-(Benchmark()).Serialization_List1000SmallJson_JsonProvider() |> ignore
-(Benchmark()).Serialization_List1000SmallJson_SystemTextJson() |> ignore
-//(Benchmark()).Serialization_StripeJson_JsonProvider() |> ignore
-//(Benchmark()).Serialization_StripeJson_SystemTextJson() |> ignore
+(*
+ // For debugging:
+(Benchmark()).SmallJson_JsonProvider() |> ignore
+(Benchmark()).SmallJson_SystemTextJson() |> ignore
+(Benchmark()).ListOf1000SmallJsons_JsonProvider() |> ignore
+(Benchmark()).ListOf1000SmallJsons_SystemTextJson() |> ignore
+//(Benchmark()).StripeJson_JsonProvider() |> ignore
+//(Benchmark()).StripeJson_SystemTextJson() |> ignore
+
 Console.ReadLine() |> ignore
+
 *)
