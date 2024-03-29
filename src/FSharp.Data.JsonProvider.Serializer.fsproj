@@ -5,7 +5,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageId>FSharp.Data.JsonProvider.Serializer</PackageId>
     <AssemblyName>FSharp.Data.JsonProvider.Serializer</AssemblyName>
-    <Version>0.0.4</Version>
+    <Version>1.0.0</Version>
     <Authors>Tuomas</Authors>
     <PackageTags>FSharp Data JsonProvider System Text Json serialization serialisation deserialization deserialisation</PackageTags>
     <Description>
@@ -19,14 +19,17 @@
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
   </PropertyGroup>
+  <PropertyGroup>
+    <DefineConstants Condition=" '$(TargetFramework)' == 'netstandard2.0' ">NETS20</DefineConstants>
+  </PropertyGroup>
 
-  <ItemGroup>
+    <ItemGroup>
     <Compile Include="Serializer.fs" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="FSharp.Data.Json.Core" Version="6.4.0" />
-    <PackageReference Include="System.Text.Json" Version="8.0.0" />
+    <PackageReference Include="System.Text.Json" Version="8.0.3" />
   </ItemGroup>
 
 </Project>

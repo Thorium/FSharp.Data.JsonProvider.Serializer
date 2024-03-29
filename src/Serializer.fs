@@ -118,10 +118,16 @@ module Serializer =
     open System.Text.Unicode
 
     /// Options for reading file with System.Text.Json
+    #if !NETS20
+    [<System.Runtime.CompilerServices.IsReadOnly>]
+    #endif
     let mutable internal default_read_options =
         JsonReaderOptions(AllowTrailingCommas = true, CommentHandling = JsonCommentHandling.Skip)
 
     /// Options for writing file with System.Text.Json
+    #if !NETS20
+    [<System.Runtime.CompilerServices.IsReadOnly>]
+    #endif
     let mutable internal default_write_options =
         JsonWriterOptions( // Trying to match current FSharp.Data better:
             Encoder = Web.JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Latin1Supplement)
