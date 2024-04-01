@@ -61,7 +61,7 @@ module internal SerializationFunctions =
         | x -> failwithf $"Unexpected json: {x}"
 
 
-    let read (contentBytes: inref<ReadOnlySpan<byte>>) (options: inref<JsonReaderOptions>) =
+    let inline read (contentBytes: inref<ReadOnlySpan<byte>>) (options: inref<JsonReaderOptions>) =
         let mutable fullreader = Utf8JsonReader(contentBytes, options)
         let nextToken = fullreader.Read()
 
@@ -100,14 +100,14 @@ module internal SerializationFunctions =
             if stream then
                 writer.Flush()
 
-    let write (item: JsonValue) (options: inref<JsonWriterOptions>) =
+    let inline write (item: JsonValue) (options: inref<JsonWriterOptions>) =
         use stream = new MemoryStream()
         use writer = new Utf8JsonWriter(stream, options)
         writeJsonValue writer item false
         writer.Flush()
         stream.ToArray()
 
-    let writeStream (destination: Stream) (item: JsonValue) (options: inref<JsonWriterOptions>) =
+    let inline writeStream (destination: Stream) (item: JsonValue) (options: inref<JsonWriterOptions>) =
         use writer = new Utf8JsonWriter(destination, options)
         writeJsonValue writer item true
         writer.Flush()
