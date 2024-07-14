@@ -18,12 +18,14 @@
     <IsTestProject>false</IsTestProject>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <PackageReadmeFile>Readme.md</PackageReadmeFile>
   </PropertyGroup>
   <PropertyGroup>
     <DefineConstants Condition=" '$(TargetFramework)' == 'netstandard2.0' ">NETS20</DefineConstants>
   </PropertyGroup>
 
     <ItemGroup>
+    <None Include="..\Readme.md" Link="Readme.md" Pack="true" PackagePath="\" />
     <Compile Include="Serializer.fs" />
   </ItemGroup>
 
