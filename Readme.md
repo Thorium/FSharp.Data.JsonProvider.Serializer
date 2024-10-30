@@ -2,7 +2,7 @@
 # FSharp.Data.JsonProvider.Serializer
 
 NuGet package: https://www.nuget.org/packages/FSharp.Data.JsonProvider.Serializer/
-This is not independent package, you still use your current JsonProvider.
+This is not an independent package; you still use your current JsonProvider.
 
 This will provide utilities to use the fast `System.Text.Json` library to serialize the `FSharp.Data.JsonProvider` items.
 
@@ -10,11 +10,11 @@ This will provide utilities to use the fast `System.Text.Json` library to serial
  - System.Text.Json: https://www.nuget.org/packages/System.Text.Json
 
 Motivation: Serialization speed.
-Typically JSON Serialization is used either so that the user is watching a progress-bar, or in a big batch-process.
+Typically, JSON Serialization is used either so that the user is watching a progress-bar, or in a big batch-process.
 
-Current FSharp.Data is using custom Json-serializer.
+Current FSharp.Data is using a custom Json-serializer.
 
-We need a compromise having the convinience of F# JsonProvider, but speed of System.Text.Json.
+We need a compromise having the convenience of F# JsonProvider, but the speed of System.Text.Json.
 
 The idea is to be in-replacement for current functions:
 
@@ -59,8 +59,8 @@ let toJson mymodel = Serializer.Serialize (mymodel.JsonValue)
 
 ```
 
-Besides of this, you continue using your existing JsonProvider implementation as is.
-Currently it uses System.Text.Json style of encoding the quote characters, etc. but if you want to customize
+Besides this, you can continue using your existing JsonProvider implementation as is.
+Currently, it uses System.Text.Json style of encoding the quote characters, etc. but if you want to customize
 your serialization more, you can set JsonReaderOptions and JsonWriterOptions as parameters.
 
 ## Initial Benchmarks
@@ -127,12 +127,12 @@ FSharp.Data uses internally class called `FSharp.Data.JsonValue` to model the JS
 
 #### From JsonProvider to JSON, Streaming
 
-With streaming support you can send JSON-data to output stream record-per-record.
+With streaming support, you can send JSON-data to output stream record-per-record.
 
 - `SerializeStream`: destination stream, FSharp.Data.JsonValue
 - `SerializeStreamWith`: destination stream, FSharp.Data.JsonValue and System.Text.Json.JsonWriterOptions
 
-Streaming may keep around the same performance characteristics, but reduce a memory allocation a bit and provide partially consumable results faster if JSON is large and the client supports streaming.
+Streaming may maintain the same performance characteristics but reduce memory allocation a bit and provide partially consumable results faster if the JSON is large and the client supports streaming.
 
 **.NET 8.0 : .NET 8.0.0 (8.0.23.53103), X64 RyuJIT AVX2**
 
