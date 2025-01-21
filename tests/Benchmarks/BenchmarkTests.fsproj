@@ -16,7 +16,7 @@
 
   <ItemGroup>
     <PackageReference Include="BenchmarkDotNet" Version="0.13.12" />
-    <PackageReference Include="FSharp.Data" Version="6.4.0" />
+    <PackageReference Include="FSharp.Data" Version="6.4.1" />
     <ProjectReference Include="..\..\src\FSharp.Data.JsonProvider.Serializer.fsproj" />
 
   </ItemGroup>

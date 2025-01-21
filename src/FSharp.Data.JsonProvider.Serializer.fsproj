@@ -5,7 +5,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageId>FSharp.Data.JsonProvider.Serializer</PackageId>
     <AssemblyName>FSharp.Data.JsonProvider.Serializer</AssemblyName>
-    <Version>1.0.2</Version>
+    <Version>1.0.3</Version>
     <Authors>Tuomas</Authors>
     <PackageTags>FSharp Data JsonProvider System Text Json serialization serialisation deserialization deserialisation</PackageTags>
     <Description>
@@ -30,8 +30,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="FSharp.Data.Json.Core" Version="6.4.0" />
-    <PackageReference Include="System.Text.Json" Version="8.0.4" />
+    <PackageReference Include="FSharp.Data.Json.Core" Version="6.4.1" />
+    <PackageReference Include="System.Text.Json" Version="9.0.0" />
   </ItemGroup>
 
 </Project>
