@@ -19,6 +19,7 @@
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <PackageReadmeFile>Readme.md</PackageReadmeFile>
+    <PackageIcon>icon.png</PackageIcon>
   </PropertyGroup>
   <PropertyGroup>
     <DefineConstants Condition=" '$(TargetFramework)' == 'netstandard2.0' ">NETS20</DefineConstants>
@@ -26,6 +27,7 @@
 
     <ItemGroup>
     <None Include="..\Readme.md" Link="Readme.md" Pack="true" PackagePath="\" />
+    <None Include="icon.png" Pack="true" PackagePath=""/>
     <Compile Include="Serializer.fs" />
   </ItemGroup>
 
