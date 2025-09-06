@@ -50,9 +50,11 @@ module internal SerializationFunctions =
     and handleToken (reader: byref<Utf8JsonReader>) =
         match reader.TokenType with
         | JsonTokenType.Number ->
-            match reader.TryGetDecimal() with
-            | true, deci -> ValueSome(JsonValue.Number(reader.GetDecimal()))
-            | false, floa -> ValueSome(JsonValue.Float(reader.GetDouble()))
+            // Try decimal first for better precision, fallback to double
+            if reader.TryGetDecimal() |> fst then
+                ValueSome(JsonValue.Number(reader.GetDecimal()))
+            else
+                ValueSome(JsonValue.Float(reader.GetDouble()))
         | JsonTokenType.Null -> ValueSome JsonValue.Null
         | JsonTokenType.String -> ValueSome(JsonValue.String(reader.GetString()))
         | JsonTokenType.Comment
@@ -107,8 +109,9 @@ module internal SerializationFunctions =
 
             writer.WriteEndObject()
 
-            if stream then
-                writer.Flush()
+        // Only flush for stream mode and only after completing a top-level record
+        if stream then
+            writer.Flush()
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     let inline write (item: JsonValue) (options: inref<JsonWriterOptions>) =
