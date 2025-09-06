@@ -9,6 +9,14 @@ open System.IO
 
 module internal SerializationFunctions =
 
+    // Estimate initial capacity for arrays based on JSON token type and depth
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
+    let inline estimateArrayCapacity () = 8  // Reasonable default for most JSON arrays
+    
+    // Estimate initial capacity for objects based on JSON structure
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
+    let inline estimateObjectCapacity () = 4  // Reasonable default for most JSON objects
+
     let rec constructArray (reader: byref<Utf8JsonReader>) (built: ResizeArray<JsonValue>) =
         if not (reader.Read()) then
             built
@@ -52,15 +60,16 @@ module internal SerializationFunctions =
         | JsonTokenType.True -> ValueSome(JsonValue.Boolean true)
         | JsonTokenType.False -> ValueSome(JsonValue.Boolean false)
         | JsonTokenType.StartArray ->
-            let array = constructArray &reader (ResizeArray())
+            let array = constructArray &reader (ResizeArray(estimateArrayCapacity()))
             ValueSome(JsonValue.Array(array.ToArray()))
         | JsonTokenType.StartObject ->
-            let record = constructRecord &reader "" (ResizeArray())
+            let record = constructRecord &reader "" (ResizeArray(estimateObjectCapacity()))
             ValueSome(JsonValue.Record(record.ToArray()))
 
         | x -> failwithf $"Unexpected json: {x}"
 
 
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     let inline read (contentBytes: inref<ReadOnlySpan<byte>>) (options: inref<JsonReaderOptions>) =
         let mutable fullreader = Utf8JsonReader(contentBytes, options)
         let nextToken = fullreader.Read()
@@ -74,6 +83,7 @@ module internal SerializationFunctions =
             | ValueNone -> JsonValue.Null
 
 
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     let rec writeJsonValue (writer: Utf8JsonWriter) (content: JsonValue) (stream: bool) =
         match content with
         | JsonValue.Null -> writer.WriteNullValue()
@@ -100,13 +110,15 @@ module internal SerializationFunctions =
             if stream then
                 writer.Flush()
 
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     let inline write (item: JsonValue) (options: inref<JsonWriterOptions>) =
-        use stream = new MemoryStream()
+        use stream = new MemoryStream(256) // Pre-size with reasonable default
         use writer = new Utf8JsonWriter(stream, options)
         writeJsonValue writer item false
         writer.Flush()
         stream.ToArray()
 
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     let inline writeStream (destination: Stream) (item: JsonValue) (options: inref<JsonWriterOptions>) =
         use writer = new Utf8JsonWriter(destination, options)
         writeJsonValue writer item true
@@ -133,58 +145,76 @@ module Serializer =
             Encoder = Web.JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Latin1Supplement)
         )
 
+    // Helper to minimize allocations in string-to-byte conversion
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
+    let inline private stringToUtf8Bytes (str: string) =
+        if String.IsNullOrEmpty(str) then
+            ReadOnlySpan<byte>.Empty
+        else
+            ReadOnlySpan(Encoding.UTF8.GetBytes str)
+
     /// Deserialize UTF8 stream to FSharp.Data.JsonValue using System.Text.Json
     [<Extension>]
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     let DeserializeBytes (jsonUtf8Bytes: ReadOnlySpan<byte>) =
         SerializationFunctions.read &jsonUtf8Bytes &default_read_options
 
     /// Deserialize UTF8 stream to FSharp.Data.JsonValue using System.Text.Json
     [<Extension>]
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     let DeserializeBytesWith (jsonUtf8Bytes: ReadOnlySpan<byte>, options: JsonReaderOptions) =
         SerializationFunctions.read &jsonUtf8Bytes &options
 
     /// Deserialize string to FSharp.Data.JsonValue using System.Text.Json
     [<Extension>]
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     let Deserialize (item: string) =
-        let content = System.ReadOnlySpan(Encoding.UTF8.GetBytes item)
+        let content = stringToUtf8Bytes item
         SerializationFunctions.read &content &default_read_options
 
     /// Deserialize string to FSharp.Data.JsonValue using System.Text.Json
     [<Extension>]
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     let DeserializeWith (item: string, options: JsonReaderOptions) =
-        let content = (System.ReadOnlySpan(Encoding.UTF8.GetBytes item))
+        let content = stringToUtf8Bytes item
         SerializationFunctions.read &content &options
 
 
     /// Serialize FSharp.Data.JsonValue to byte array using System.Text.Json
     [<Extension>]
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     let SerializeBytes (item: JsonValue) =
         SerializationFunctions.write item &default_write_options
 
     /// Serialize FSharp.Data.JsonValue to byte array using System.Text.Json
     [<Extension>]
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     let SerializeBytesWith (item: JsonValue, options: JsonWriterOptions) =
         SerializationFunctions.write item &options
 
     /// Serialize FSharp.Data.JsonValue to Stream using System.Text.Json
     /// Will flush per each JSON record written.
     [<Extension>]
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     let SerializeStream (destination: Stream, item: JsonValue) =
         SerializationFunctions.writeStream destination item &default_write_options
 
     /// Serialize FSharp.Data.JsonValue to Stream using System.Text.Json
     /// Will flush per each JSON record written.
     [<Extension>]
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     let SerializeStreamWith (destination: Stream, item: JsonValue, options: JsonWriterOptions) =
         SerializationFunctions.writeStream destination item &options
 
 
     /// Serialize FSharp.Data.JsonValue to string using System.Text.Json
     [<Extension>]
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     let Serialize (item: JsonValue) =
         Encoding.UTF8.GetString(SerializationFunctions.write item &default_write_options)
 
     /// Serialize FSharp.Data.JsonValue to string using System.Text.Json
     [<Extension>]
+    [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     let SerializeWith (item: JsonValue, options: JsonWriterOptions) =
         Encoding.UTF8.GetString(SerializationFunctions.write item &options)
