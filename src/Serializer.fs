@@ -109,9 +109,9 @@ module internal SerializationFunctions =
 
             writer.WriteEndObject()
 
-        // Only flush for stream mode and only after completing a top-level record
-        if stream then
-            writer.Flush()
+            // Only flush for stream mode and only after completing a top-level record
+            if stream then
+                writer.Flush()
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     let inline write (item: JsonValue) (options: inref<JsonWriterOptions>) =
