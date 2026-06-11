@@ -51,10 +51,9 @@ module internal SerializationFunctions =
         match reader.TokenType with
         | JsonTokenType.Number ->
             // Try decimal first for better precision, fallback to double
-            if reader.TryGetDecimal() |> fst then
-                ValueSome(JsonValue.Number(reader.GetDecimal()))
-            else
-                ValueSome(JsonValue.Float(reader.GetDouble()))
+            match reader.TryGetDecimal() with
+            | true, d -> ValueSome(JsonValue.Number d)
+            | false, _ -> ValueSome(JsonValue.Float(reader.GetDouble()))
         | JsonTokenType.Null -> ValueSome JsonValue.Null
         | JsonTokenType.String -> ValueSome(JsonValue.String(reader.GetString()))
         | JsonTokenType.Comment
