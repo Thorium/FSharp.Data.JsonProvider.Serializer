@@ -43,7 +43,7 @@ let testBasics() =
     let readWithSystem_writeWithProvider = 
         let dom = SmallItem.Load (Serializer.Deserialize sampleJson)
         if (dom.MyRoot.Name <> "Tuomas") then failwith "JsonProvider didn't work"
-        dom.JsonValue.ToString(JsonSaveOptions.DisableFormatting)
+        dom.JsonValue.ToString JsonSaveOptions.DisableFormatting
     
     if (readWithProvider_writeWithSystem <> readWithSystem_writeWithProvider) then
         Console.WriteLine readWithProvider_writeWithSystem
@@ -63,7 +63,7 @@ let testExtended() =
     let readWithSystem_writeWithProvider = 
         let dom = SpecialsItem.Load (Serializer.Deserialize specialsPlusExtraStuff)
         if (dom.MyRoot.Name <> "Tuomas") then failwith "JsonProvider didn't work"
-        dom.JsonValue.ToString(JsonSaveOptions.DisableFormatting)
+        dom.JsonValue.ToString JsonSaveOptions.DisableFormatting
     
     if (readWithProvider_writeWithSystem <> readWithSystem_writeWithProvider) then
         Console.WriteLine readWithProvider_writeWithSystem
@@ -98,11 +98,11 @@ type Benchmark() =
 
     // Test small JSON
 
-    [<Benchmark()>]
+    [<Benchmark>]
     member this.SmallJson_JsonProvider() =
         let dom = SmallItem.Parse sampleJson
         if (dom.MyRoot.Name <> "Tuomas") then failwith "didn't work"
-        let res = dom.JsonValue.ToString(JsonSaveOptions.DisableFormatting)
+        let res = dom.JsonValue.ToString JsonSaveOptions.DisableFormatting
         res.Length
 
         
@@ -113,11 +113,11 @@ type Benchmark() =
         let res = Serializer.Serialize (dom.JsonValue)
         res.Length
 
-    [<Benchmark()>]
+    [<Benchmark>]
     member this.ListOf1000SmallJsons_JsonProvider() =
         let dom = ListItems.Parse thousandItems
         if (dom.Items.[500].MyRoot.Name <> "Tuomas") then failwith "didn't work"
-        let res = dom.JsonValue.ToString(JsonSaveOptions.DisableFormatting)
+        let res = dom.JsonValue.ToString JsonSaveOptions.DisableFormatting
         res.Length
 
         
