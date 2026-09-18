@@ -17,19 +17,19 @@ let sampleJsonLitral = """{"myRoot": {
     }}"""
 
 let sampleJson = sampleJsonLitral
-type SmallItem = FSharp.Data.JsonProvider<schemaJson, SampleIsList=true>
+type SmallItem = JsonProvider<schemaJson, SampleIsList=true>
 
 [<Literal>]
 let sampleJsonWithSpecials = """{"myRoot": { 
         "name": "Tuomas", "opt": 123.5, "intOrStr": 432, "myObjÄ": { "a": 1 },"myObj2": [1,2,3],"c": null,
         "testÄ": "Ä", "myDateTime": "2023-10-12 14:00:00", "empty": {}
     }}"""
-type SpecialsItem = FSharp.Data.JsonProvider<sampleJsonWithSpecials>
+type SpecialsItem = JsonProvider<sampleJsonWithSpecials>
 
 [<Literal>]
 let listJson =
     """{"items": [""" + sampleJsonLitral + "] }"
-type ListItems = FSharp.Data.JsonProvider<listJson>
+type ListItems = JsonProvider<listJson>
 
 Console.WriteLine sampleJson
 
